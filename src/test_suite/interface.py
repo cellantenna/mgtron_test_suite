@@ -61,32 +61,39 @@ def find_device(DEVICE_NUMBER: int = DEVICE_PORT) -> tuple[str, list[str]]:
         # devices = [os.path.join(root, filename) for root, dir,
         #           files in os.walk("/user/") if filename in files]
 
-        return "COM3"
+        return "COM3", ["COM3"]
+    return "None", ["None"]
 
 
-def serial_call(*args) -> None:
+def serial_call(*args, PORT: str = find_device(0)[0][0]) -> None:
     logger.debug(msg="Serial call to device initiated")
-    # logger.info(msg=f"Serial call initiated from {platform.system()} to {find_device()[DEVICE_PORT]}")
-    sleep(0.1)  # Allow time to read and execute via serial
-    global PORT
+
+    NAME: str = serial_call.__name__
+
+    sleep(0.1)  # Allow time to read and execute via serial *REQUIRED*
+
     try:
-        with serial.Serial() as ser:  #  If the teensy is corrupted the GUI freezes here
+        with serial.Serial() as ser:  # If the teensy is corrupted the GUI freezes here
+            ser.port = PORT.strip()
+            logger.debug(
+                msg=f"Serial device set from {NAME}()")
             ser.baudrate = BAUDRATE
-            logger.debug(msg=f"baudrate set from {serial_call.__name__}")
-            ser.port = PORT
-            logger.debug(msg=f"Serial device set from {serial_call.__name__}")
+            logger.debug(msg=f"baudrate set from {NAME}()")
             ser.timeout = 2  # seconds
-            logger.debug(msg=f"timeout set from {serial_call.__name__}")
+            logger.debug(msg=f"timeout set from {NAME}()")
             ser.open()
-            logger.debug(msg=f"opening serial connection from {serial_call.__name__}")
+            logger.debug(
+                msg=f"opening serial connection from {NAME}()")
             ser.write(f"{' '.join([arg for arg in args])}".encode("utf-8"))
-            logger.debug(msg=f"information send via serial protocol; {serial_call.__name__}")
-            # outputs: list[str] = [line.decode('ascii') for line in ser.readlines()] # Serial output from MGTron
-            # outputs = " ".join(output for output in outputs)
-            # print(outputs)
+            logger.debug(
+                msg=f"information sent via serial protocol; {NAME}()")
+            ser.flush()
+
     except (serial.SerialException, NameError):
         logger.exception(msg="No device found")
 
+    logger.debug(
+        msg=f"Contextually closed serial connection from {NAME}()")
 
 @dataclass(slots=True)
 class Megatron:
@@ -95,91 +102,91 @@ class Megatron:
     logger.info(msg="\n\nGUI LAUNCHED\n\n")
 
     try:
-        logger.info(msg="Getting the port name of device")
-        global PORT
-        PORT = find_device(DEVICE_PORT)[0]
+        logger.info(msg=f"Getting the port name of device")
+        PORT = find_device(DEVICE_PORT)[0]  # type: ignore
         logger.info(msg=f"Connected device path: {PORT}")
     except TypeError:
-        logger.error(msg="No device found on system")
         logger.exception(msg="No device found on system")
 
-    def status(self) -> None:
+    @classmethod
+    def status(cls, PORT: str) -> None:
         """Check the status of the board"""
 
-        serial_call("s")
         logger.info(f"{Megatron.status.__name__} function executed")
+        serial_call("s", PORT=PORT)
 
-    def change_power(self, channel: int, power_level: int) -> serial_call:
+    def change_power(self, channel: int, power_level: int, PORT: str):
         """
         Change the power level of a channel
         Range: 0 - 63
         """
-
+        print(f"Change power: PORT === {PORT}")
         logger.info(f"{Megatron.change_power.__name__} function executed")
         logger.info(msg=f"Connected device path: {PORT}")
-        return serial_call("p", str(channel), str(power_level))
+        return serial_call("p", str(channel), str(power_level), PORT=PORT)
 
-    def change_freq(self, channel: int, frequency: float) -> serial_call:
+    def change_freq(self, channel: int, frequency: float, PORT: str):
         """
         Change the frequency of a channel
         Range: 50 - 6400 MHz
         """
 
         logger.info(f"{Megatron.change_freq.__name__} function executed")
-        return serial_call("f", str(channel), str(frequency))
+        print()
+        return serial_call("f", str(channel), str(frequency), PORT=PORT)
 
-    def change_bandwidth(self, channel: int, percentage: int) -> serial_call:
+    def change_bandwidth(self, channel: int, percentage: int, PORT: str):
         """
         Change the bandwidth of a channel
         Range: 0 - 100
         """
 
         logger.info(f"{Megatron.change_bandwidth.__name__} function executed")
-        return serial_call("b", str(channel), str(percentage))
+        return serial_call("b", str(channel), str(percentage), PORT=PORT)
 
-    def save_state(self, state: bool) -> None:
+    def save_state(self, state: bool, PORT: str) -> None:
         """Save each settings made by the user into memory for next startup"""
 
-        state = 1 if state else 0
+        state = 1 if state else 0  # type: ignore
         try:
-            serial_call("x", str(state))
+            serial_call("x", str(state), PORT=PORT)
             logger.info(f"{Megatron.save_state.__name__} function executed")
         except TypeError:
             logger.exception(msg="No device assigned")
 
-    def amplification(self, channel: int, state: bool) -> None:
+    def amplification(self, channel: int, state: bool, PORT: str) -> None:
         """Output HIGH or LOW logic level out of a chosen channel"""
 
-        state = 1 if state else 0
-        serial_call("a", str(channel), str(state))
+        state = 1 if state else 0  # type: ignore
+        serial_call("a", str(channel), str(state), PORT=PORT)
         logger.info(f"{Megatron.amplification.__name__} function executed")
 
-    def stability(self, state: bool) -> None:
+    def stability(self, state: bool, PORT: str) -> None:
         """Boolean a second filtering stage of capacitors for further stability"""
 
-        state = 1 if state else 0
-        serial_call("~", str(state))
+        state = 1 if state else 0  # type: ignore
+        serial_call("~", str(state), PORT=PORT)
         logger.info(f"{Megatron.stability.__name__} function executed")
 
-    def noise_control(self, state: bool, percentage: int) -> None:
+    def noise_control(self, state: bool, percentage: int, PORT: str) -> None:
         """
         Optimal settings hardcoded; Input @ %100 Output @ %85
         state 0: Output stage
         state 1: Input stage
         """
 
-        state = 1 if state else 0
-        serial_call("n", str(state), str(percentage))
+        state = 1 if state else 0  # type: ignore
+        serial_call("n", str(state), str(percentage), PORT=PORT)
         logger.info(f"{Megatron.noise_control.__name__} function executed")
 
-    def reset_board(self) -> None:
+    def reset_board(self, PORT: str) -> None:
         """Reset the parameters of the board"""
 
         [
             (
-                serial_call("p", str(i), "0"),
-                serial_call("b", str(i), "0"),
-                serial_call("f", str(i), "50.00"),
+                serial_call("p", str(i), "0", PORT=PORT),
+                # serial_call("b", str(i), "0", PORT=PORT),
+                # serial_call("f", str(i), "50.00", PORT=PORT),
             )
             for i in range(1, 9)
         ]
