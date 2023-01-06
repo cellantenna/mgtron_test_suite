@@ -147,7 +147,7 @@ def main():
         # Set the peak measurement to channel variable
         rigol.set_markers(marker=1, freq=val)
 
-        time.sleep(0.1)
+        time.sleep(3)
         print(
             f"Channel: {F.YELLOW}{i}{R}, Frequency: {F.YELLOW}{val}{R}, Power: {F.CYAN}{63}{R}")
 
