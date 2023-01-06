@@ -21,7 +21,7 @@ logging.basicConfig(
 
 BAUDRATE = 115_200
 DEVICE_PORT: int = int()
-PORT: str = str()
+# PORT: str = str()
 
 
 def find_device(DEVICE_NUMBER: int = DEVICE_PORT) -> tuple[str, list[str]]:
@@ -45,7 +45,7 @@ def find_device(DEVICE_NUMBER: int = DEVICE_PORT) -> tuple[str, list[str]]:
                 capture_output=False,
             )
             results = sorted(results_.stdout.strip().splitlines())
-            global PORT
+            # global PORT
             PORT = results[DEVICE_NUMBER]
             logger.info(msg=f"Connected Devices: {results}")
             logger.debug(msg=f"Chosen Device: {PORT}")

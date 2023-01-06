@@ -123,27 +123,27 @@ def main():
     for i, val in enumerate(band_2.values(), start=1):
 
         time.sleep(1)
-        rigol.read_start_frequency(freq=band_2.get("1") - 1e6)
+        rigol.read_start_frequency(freq=band_2.get("1") - 1e6)  # type: ignore
         time.sleep(1)
-        rigol.read_stop_frequency(freq=band_2.get("8") + 1e6)
+        rigol.read_stop_frequency(freq=band_2.get("8") + 1e6)  # type: ignore
 
         print(f"{F.GREEN}Setting Channel {i} to {val / 1e6} Mhz{R}")
 
         mgtron.change_freq(
             frequency=val,
             channel=i,
-            PORT=f"dev/ttyACM{port}"
+            PORT=f"/dev/ttyACM{port}"
         )
         mgtron.change_power(
             power_level=63,
             channel=i,
-            PORT=f"dev/ttyACM{port}"
+            PORT=f"/dev/ttyACM{port}"
         )
 
         mgtron.change_bandwidth(
             percentage=0,
             channel=i,
-            PORT=f"dev/ttyACM{port}"
+            PORT=f"/dev/ttyACM{port}"
         )
 
         # Set the peak measurement to channel variable
