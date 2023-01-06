@@ -122,7 +122,9 @@ def main():
 
     for i, val in enumerate(band_2.values(), start=1):
 
+        time.sleep(1)
         rigol.read_start_frequency(freq=band_2.get("1") - 1e6)
+        time.sleep(1)
         rigol.read_stop_frequency(freq=band_2.get("8") + 1e6)
 
         print(f"{F.GREEN}Setting Channel {i} to {val / 1e6} Mhz{R}")
@@ -145,6 +147,7 @@ def main():
         )
 
         # Set the peak measurement to channel variable
+        time.sleep(1)
         rigol.set_markers(marker=1, freq=val)
 
         time.sleep(3)
