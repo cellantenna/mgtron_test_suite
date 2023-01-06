@@ -115,52 +115,64 @@ def main():
     # channel_list = channel_select()
 
     port = int(input("Enter enuermated device number: "))
-    # band_to_test = int(input("Enter band to test, 2 for 4: "))
+    # # band_to_test = int(input("Enter band to test, 2 for 4: "))
 
-    band_2 = automate_octo_test(2)
-    # band_5 = automate_octo_test(5)
+    # band_2 = automate_octo_test(2)
+    # # band_5 = automate_octo_test(5)
 
-    for i, val in enumerate(band_2.values(), start=1):
+    # for i, val in enumerate(band_2.values(), start=1):
 
-        time.sleep(1)
-        rigol.read_start_frequency(freq=band_2.get("1") - 1e6)  # type: ignore
-        time.sleep(1)
-        rigol.read_stop_frequency(freq=band_2.get("8") + 1e6)  # type: ignore
+    #     time.sleep(1)
+    #     rigol.read_start_frequency(freq=band_2.get("1") - 1e6)  # type: ignore
+    #     time.sleep(1)
+    #     rigol.read_stop_frequency(freq=band_2.get("8") + 1e6)  # type: ignore
 
-        print(f"{F.GREEN}Setting Channel {i} to {val / 1e6} Mhz{R}")
+    #     print(f"{F.GREEN}Setting Channel {i} to {val / 1e6} Mhz{R}")
 
-        mgtron.change_freq(
-            frequency=val,
-            channel=i,
-            PORT=f"/dev/ttyACM{port}"
-        )
-        mgtron.change_power(
-            power_level=63,
-            channel=i,
-            PORT=f"/dev/ttyACM{port}"
-        )
+    #     mgtron.change_freq(
+    #         frequency=val,
+    #         channel=i,
+    #         PORT=f"/dev/ttyACM{port}"
+    #     )
+    #     mgtron.change_power(
+    #         power_level=63,
+    #         channel=i,
+    #         PORT=f"/dev/ttyACM{port}"
+    #     )
 
-        mgtron.change_bandwidth(
-            percentage=0,
-            channel=i,
-            PORT=f"/dev/ttyACM{port}"
-        )
+    #     mgtron.change_bandwidth(
+    #         percentage=0,
+    #         channel=i,
+    #         PORT=f"/dev/ttyACM{port}"
+    #     )
 
-        # Set the peak measurement to channel variable
-        time.sleep(1)
-        rigol.set_markers(marker=1, freq=val)
+    #     # Set the peak measurement to channel variable
+    #     time.sleep(1)
+    #     rigol.set_markers(marker=1, freq=val)
 
-        time.sleep(3)
-        print(
-            f"Channel: {F.YELLOW}{i}{R}, Frequency: {F.YELLOW}{val}{R}, Power: {F.CYAN}{63}{R}")
+    #     time.sleep(3)
+    #     print(
+    #         f"Channel: {F.YELLOW}{i}{R}, Frequency: {F.YELLOW}{val}{R}, Power: {F.CYAN}{63}{R}")
 
-        # Take rigol screenshot
-        print(f"{F.GREEN}Taking Rigol Screenshot{R}")
-        rigol.save_screenshot(filename=f"E:port_{port}_channel_{i}.png")
-        time.sleep(25)  # Time for rigol to save screenshot
+    #     # Take rigol screenshot
+    #     print(f"{F.GREEN}Taking Rigol Screenshot{R}")
+    #     rigol.save_screenshot(filename=f"E:port_{port}_channel_{i}.png")
+    #     time.sleep(25)  # Time for rigol to save screenshot
 
-    end_time = time.time()
-    print(f"\n{F.RED}Time Elapsed: {(end_time - begin_time) / 60:.2f}{R}")
+    # end_time = time.time()
+    # print(f"\n{F.RED}Time Elapsed: {(end_time - begin_time) / 60:.2f}{R}")
+
+    mgtron.change_freq(
+        frequency=2412e6,
+        channel=1,
+        PORT=f"/dev/ttyACM0",
+    )
+
+    mgtron.change_power(
+        power_level=63,
+        channel=1,
+        PORT=f"/dev/ttyACM0",
+    )
 
 
 if __name__ == "__main__":
