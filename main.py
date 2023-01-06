@@ -162,17 +162,20 @@ def main():
     # end_time = time.time()
     # print(f"\n{F.RED}Time Elapsed: {(end_time - begin_time) / 60:.2f}{R}")
 
-    mgtron.change_freq(
-        frequency=2412e6,
-        channel=1,
-        PORT=f"/dev/ttyACM0",
-    )
+    for i in range(1,9):
 
-    mgtron.change_power(
-        power_level=63,
-        channel=1,
-        PORT=f"/dev/ttyACM0",
-    )
+        mgtron.change_freq(
+            frequency=2412e6,
+            channel=i,
+            PORT=f"/dev/ttyACM0",
+        )
+
+        
+        mgtron.change_power(
+            power_level=63,
+            channel=i,
+            PORT=f"/dev/ttyACM0",
+        )
 
 
 if __name__ == "__main__":
