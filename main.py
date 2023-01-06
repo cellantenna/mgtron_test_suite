@@ -120,10 +120,10 @@ def main():
     band_2 = automate_octo_test(2)
     # band_5 = automate_octo_test(5)
 
-    rigol.read_start_frequency(freq=band_2.get("1") - 1e6)
-    rigol.read_stop_frequency(freq=band_2.get("8") + 1e6)
-
     for i, val in enumerate(band_2.values(), start=1):
+
+        rigol.read_start_frequency(freq=band_2.get("1") - 1e6)
+        rigol.read_stop_frequency(freq=band_2.get("8") + 1e6)
 
         print(f"{F.GREEN}Setting Channel {i} to {val / 1e6} Mhz{R}")
 
@@ -154,7 +154,7 @@ def main():
         # Take rigol screenshot
         print(f"{F.GREEN}Taking Rigol Screenshot{R}")
         rigol.save_screenshot(filename=f"E:port_{port}_channel_{i}.png")
-        time.sleep(15)  # Time for rigol to save screenshot
+        time.sleep(25)  # Time for rigol to save screenshot
 
     end_time = time.time()
     print(f"\n{F.RED}Time Elapsed: {(end_time - begin_time) / 60:.2f}{R}")
