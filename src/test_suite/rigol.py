@@ -11,7 +11,7 @@ class DSA800:
         self.manufacturer = "Rigol"
         self.rm = pyvisa.ResourceManager()  # Create a new resource manager object
         self.analyzer = self.rm.open_resource(
-            resource_name='TCPIP::10.10.30.104::INSTR',  # DSA832E
+            resource_name='TCPIP0::10.10.30.50::INSTR',  # DSA832E
             timeout=5_000,
             chunk_size=1_024_000,
             access_mode=pyvisa.constants.AccessModes.no_lock,
