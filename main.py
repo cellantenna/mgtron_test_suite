@@ -109,19 +109,19 @@ def kill_power(mgtron: Megatron, port: int):
         mgtron.change_freq(
             frequency=50,
             channel=i,
-            PORT=f"/dev/ttyACM{port + 1}",
+            PORT=f"/dev/ttyACM{port}",
         )
 
         mgtron.change_power(
             power_level=0,
             channel=i,
-            PORT=f"/dev/ttyACM{port + 1}",
+            PORT=f"/dev/ttyACM{port}",
         )
 
         mgtron.change_bandwidth(
             percentage=0,
             channel=i,
-            PORT=f"/dev/ttyACM{port + 1}",
+            PORT=f"/dev/ttyACM{port}",
         )
 
 
@@ -132,7 +132,7 @@ def main():
     mgtron = Megatron()
     rigol = DSA800()
 
-    window_offet: float = 0.1e6
+    window_offet: float = 1000e6
     conv_factor: float = 1e6
 
     port = int(input("Enter enuermated device number: "))
