@@ -18,6 +18,10 @@ Here we write upgrade and change notes.
 
 ---
 
+## ✴️[0.3.0] - 2023 JAN 10
+
+- Added a quick test function
+
 ## ✴️[0.2.1] - 2023 JAN 06
 
 - Init CHANGELOG

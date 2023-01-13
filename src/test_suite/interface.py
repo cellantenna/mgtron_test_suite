@@ -15,7 +15,7 @@ logging.basicConfig(
     format="%(asctime)s :: %(name)s :: %(message)s :: %(levelname)s",
     datefmt="%d-%b-%y %H:%M:%S",
     filename=f"{ROOT}/mg.log",
-    filemode="a",
+    filemode="w",
 )
 
 
@@ -65,7 +65,7 @@ def find_device(DEVICE_NUMBER: int = DEVICE_PORT) -> tuple[str, list[str]]:
     return "None", ["None"]
 
 
-def serial_call(*args, PORT: str = find_device(0)[0][0]) -> None:
+def serial_call(*args, PORT: str = find_device(DEVICE_NUMBER=0)[0][0]) -> None:
     logger.debug(msg="Serial call to device initiated")
 
     NAME: str = serial_call.__name__
@@ -94,6 +94,7 @@ def serial_call(*args, PORT: str = find_device(0)[0][0]) -> None:
 
     logger.debug(
         msg=f"Contextually closed serial connection from {NAME}()")
+
 
 @dataclass(slots=True)
 class Megatron:
@@ -132,7 +133,7 @@ class Megatron:
         """
 
         logger.info(f"{Megatron.change_freq.__name__} function executed")
-        print()
+        # print()
         return serial_call("f", str(channel), str(frequency), PORT=PORT)
 
     def change_bandwidth(self, channel: int, percentage: int, PORT: str):
