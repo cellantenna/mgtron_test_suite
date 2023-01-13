@@ -301,9 +301,9 @@ def main():
         ) for channel in range(1, 9)
 
     ]
-    # end_time = time.time()
-    # print(f"\n{F.RED}Time Elapsed: {(end_time - begin_time) / 60:.2f}{R} minutes")
-    # kill_power(port=port, mgtron=mgtron)
+    end_time = time.time()
+    print(f"\n{F.RED}Time Elapsed: {(end_time - begin_time) / 60:.2f}{R} minutes")
+    kill_power(port=port, mgtron=mgtron)
 
 
 if __name__ == "__main__":
