@@ -154,6 +154,13 @@ class DSA800:
         self.analyzer.write(  # type: ignore
             f":MMEM:STOR:TRAC TRACE{trace_num}, E:Trace{trace_num}:{filename}.csv")
 
+    def get_trace_data(self, trace_num: int) -> str:
+        """Fetch the trace data from the instrument"""
+
+        return self.analyzer.query(  # type: ignore
+            f":TRAC:DATA? TRACE{trace_num}"
+        )
+
     def screen_state(self, on_or_off: int) -> None:
         """Turn the screen on or off; Off increases measurement speed"""
 

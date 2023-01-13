@@ -225,13 +225,15 @@ def wifi_test(mgtron: Megatron, port: int, channel: int, rigol: DSA800, wifi_fre
 
         # Take rigol trace values
         print(f"{F.GREEN}Taking Rigol Screenshot{R}")
-        rigol.save_trace(
-            trace_num=1, filename=f"port_{port}_channel_{channel}_freq_{freq}")
+        # rigol.save_trace(
+        # trace_num=1, filename=f"port_{port}_channel_{channel}_freq_{freq}")
+
+        print(rigol.get_trace_data(trace_num=1))
 
         # rigol.save_screenshot(
         # filename=f"port_{port}_channel_{channel}_freq_{freq}")
 
-        time.sleep(2)
+        time.sleep(4)
 
 
 def plot_csv(filename: str) -> None:
@@ -241,28 +243,33 @@ def plot_csv(filename: str) -> None:
 
     df.columns.values[:3] = ["Frequency", "", "Amplitude"]
 
-    df.plot(x="Frequency", y="Amplitude", kind="line")
-
     # Legend
     plt.legend(["Amplitude"])
 
-    # Mark the highest amplitutde peak in the trace w/ an arrow
+    # Mark the highest amplitutde peak in the trace with a long arrow
     plt.annotate(
-        f"{df['Amplitude'].max():.2f} dBm\n{df['Amplitude'].idxmax():.2f} MHz",
+        f"Peak Amplitude: {df['Amplitude'].max()} dB\nFrequency: {df['Frequency'][df['Amplitude'].idxmax()] // 1e6:.2f} MHz",
         xy=(df["Frequency"][df["Amplitude"].idxmax()],
             df["Amplitude"].max()),
-        xytext=(df["Frequency"][df["Amplitude"].idxmax()] + 200,
-                df["Amplitude"].max() - 2),
-        arrowprops=dict(facecolor="red", shrink=0.02),
+        xytext=(df["Frequency"][df["Amplitude"].idxmax()],
+                df["Amplitude"].max() - 5),
+        arrowprops=dict(facecolor="red", shrink=0.05),
     )
-    # plt.show()
+
     # extract channel and port from '7/0286-5B07/TRACE1:PORT_0_CHANNEL_1_FREQ_1000.CSV.png'
     port = filename.split(":")[1].split("_")[:2][-1]
     channel = filename.split(":")[1].split("_")[3]
+    freq = filename.split(":")[1].split("_")[5].split(".")[0]
 
     print(f"{F.GREEN}Saving plot{R}")
-    print(f"{F.GREEN}Port: {port}, Channel: {channel}{R}")
-    plt.savefig(f"trace_plots/ACM{port}_channel_{channel}.png")
+    print(f"{F.GREEN}Port: {port}, Channel: {channel}, Frequency: {freq}{R}")
+
+    plt.xlabel("Frequency (MHz)")
+    plt.ylabel("Amplitude (dBm)")
+    plt.title(f"Card: {port}, Channel: {channel}, Frequency: {freq}")
+    plt.plot(df["Frequency"], df["Amplitude"])
+    plt.savefig(f"trace_plots/ACM{port}_channel_{channel}_freq_{freq}.png")
+    plt.close()
 
 
 def main():
@@ -280,11 +287,11 @@ def main():
     band = automate_octo_test(band_to_test)
 
     # Get all of the files in /run/media/djhunter67/0286-5B07/ that end with .CSV
-    files = glob.glob("/run/media/djhunter67/0286-5B07/*.csv")
-    print(files)
+    # files = glob.glob("/run/media/djhunter67/0286-5B07/*.CSV")
 
-    # plot_csv(
-    # filename="/run/media/djhunter67/0286-5B07/TRACE1:PORT_0_CHANNEL_1_FREQ_1000.CSV")
+    # [
+    #     plot_csv(file) for file in files
+    # ]
 
     [
         (
