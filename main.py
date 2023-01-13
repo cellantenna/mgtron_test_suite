@@ -1,9 +1,12 @@
+import glob
 from typing import Iterable
 from src.test_suite.interface import Megatron
 from src.test_suite.rigol import DSA800
 import time
 import random
 from colorama import Fore as F
+import pandas as pd
+import matplotlib.pyplot as plt
 
 R = F.RESET
 
@@ -222,13 +225,44 @@ def wifi_test(mgtron: Megatron, port: int, channel: int, rigol: DSA800, wifi_fre
 
         # Take rigol trace values
         print(f"{F.GREEN}Taking Rigol Screenshot{R}")
-        # rigol.save_trace(
-        # trace_num=1, filename=f"port_{port}_channel_{channel}_freq_{freq}")
+        rigol.save_trace(
+            trace_num=1, filename=f"port_{port}_channel_{channel}_freq_{freq}")
 
-        rigol.save_screenshot(
-            filename=f"port_{port}_channel_{channel}_freq_{freq}")
+        # rigol.save_screenshot(
+        # filename=f"port_{port}_channel_{channel}_freq_{freq}")
 
-        time.sleep(5)
+        time.sleep(2)
+
+
+def plot_csv(filename: str) -> None:
+    """Plot the csv file"""
+
+    df = pd.read_csv(filename, skiprows=3)
+
+    df.columns.values[:3] = ["Frequency", "", "Amplitude"]
+
+    df.plot(x="Frequency", y="Amplitude", kind="line")
+
+    # Legend
+    plt.legend(["Amplitude"])
+
+    # Mark the highest amplitutde peak in the trace w/ an arrow
+    plt.annotate(
+        f"{df['Amplitude'].max():.2f} dBm\n{df['Amplitude'].idxmax():.2f} MHz",
+        xy=(df["Frequency"][df["Amplitude"].idxmax()],
+            df["Amplitude"].max()),
+        xytext=(df["Frequency"][df["Amplitude"].idxmax()] + 200,
+                df["Amplitude"].max() - 2),
+        arrowprops=dict(facecolor="red", shrink=0.02),
+    )
+    # plt.show()
+    # extract channel and port from '7/0286-5B07/TRACE1:PORT_0_CHANNEL_1_FREQ_1000.CSV.png'
+    port = filename.split(":")[1].split("_")[:2][-1]
+    channel = filename.split(":")[1].split("_")[3]
+
+    print(f"{F.GREEN}Saving plot{R}")
+    print(f"{F.GREEN}Port: {port}, Channel: {channel}{R}")
+    plt.savefig(f"trace_plots/ACM{port}_channel_{channel}.png")
 
 
 def main():
@@ -245,25 +279,31 @@ def main():
 
     band = automate_octo_test(band_to_test)
 
-    # rigol.full_span()
-    # time.sleep(1)
+    # Get all of the files in /run/media/djhunter67/0286-5B07/ that end with .CSV
+    files = glob.glob("/run/media/djhunter67/0286-5B07/*.csv")
+    print(files)
 
-    kill_power(port=port, mgtron=mgtron)
+    # plot_csv(
+    # filename="/run/media/djhunter67/0286-5B07/TRACE1:PORT_0_CHANNEL_1_FREQ_1000.CSV")
 
-    for channel in range(1, 9):
-        wifi_test(
-            mgtron=mgtron,
-            port=port,
-            channel=channel,
-            rigol=rigol,
-            wifi_freqs=[
-                freq for freq in band.values()
-            ]
-        )
+    [
+        (
+            kill_power(port=port, mgtron=mgtron),
+            wifi_test(
+                mgtron=mgtron,
+                port=port,
+                channel=channel,
+                rigol=rigol,
+                wifi_freqs=[
+                    freq for freq in band.values()
+                ]
+            ),
+        ) for channel in range(1, 9)
 
-    end_time = time.time()
-    print(f"\n{F.RED}Time Elapsed: {(end_time - begin_time) / 60:.2f}{R} minutes")
-    kill_power(port=port, mgtron=mgtron)
+    ]
+    # end_time = time.time()
+    # print(f"\n{F.RED}Time Elapsed: {(end_time - begin_time) / 60:.2f}{R} minutes")
+    # kill_power(port=port, mgtron=mgtron)
 
 
 if __name__ == "__main__":

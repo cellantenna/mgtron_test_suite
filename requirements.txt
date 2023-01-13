@@ -10,6 +10,7 @@ kiwisolver
 matplotlib
 numpy
 packaging
+pandas
 Pillow
 pluggy
 pycodestyle
@@ -17,6 +18,7 @@ pyparsing
 pyserial
 pytest
 python-dateutil
+pytz
 pyusb
 PyVISA
 PyVISA-py
